@@ -22,3 +22,8 @@ variable "database_ip" {
   type = "string"
   default = "10.0.3.0/24"
 }
+
+variable "sql_ip" {
+  type = "string"
+  default = "10.0.4.0/24"
+}
