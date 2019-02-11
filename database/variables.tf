@@ -9,6 +9,8 @@ variable "subnet_ip" {
   default = "10.0.3.0/24"
 }
 
-variable "client_id" {}
+variable "backend_ip" {}
 
-variable "client_secret" {}
+variable "username" {}
+
+variable "password" {}

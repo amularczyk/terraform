@@ -1,9 +1,16 @@
-resource "azurerm_subnet" "terraform" {
-  name                 = "SQL"
+resource "azurerm_subnet" "backend" {
+  name                 = "Backend"
   resource_group_name  = "${var.resource_group_name}"
   virtual_network_name = "${var.virtual_network_name}"
   address_prefix       = "${var.subnet_ip}"
   service_endpoints    = ["Microsoft.Sql"]
+}
+
+resource "azurerm_public_ip" "vm" {
+  name                = "terraform-ip-${terraform.workspace}"
+  resource_group_name = "${var.resource_group_name}"
+  location            = "${var.location}"
+  allocation_method   = "Dynamic"
 }
 
 resource "azurerm_network_interface" "terraform" {
@@ -13,63 +20,45 @@ resource "azurerm_network_interface" "terraform" {
 
   ip_configuration {
     name                          = "testconfiguration1"
-    subnet_id                     = "${azurerm_subnet.terraform.id}"
-    private_ip_address_allocation = "dynamic"
+    subnet_id                     = "${azurerm_subnet.backend.id}"
+    private_ip_address_allocation = "Dynamic"
+    public_ip_address_id          = "${azurerm_public_ip.vm.id}"
   }
 }
 
-data "azurerm_client_config" "current" {}
-
-resource "azurerm_key_vault" "terraform" {
-  name                = "terraform-vault-${terraform.workspace}"
+resource "azurerm_network_security_group" "backend" {
+  name                = "BackendSubnetSecurityGroup-${terraform.workspace}"
   resource_group_name = "${var.resource_group_name}"
   location            = "${var.location}"
-  enabled_for_disk_encryption = true
-  tenant_id           = "${data.azurerm_client_config.current.tenant_id}"
 
-  sku {
-    name = "standard"
+  security_rule {
+    name                       = "Allow-Subnet-Backend"
+    priority                   = 100
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "*"
+    source_port_range          = "*"
+    destination_port_range     = "*"
+    source_address_prefix      = "${var.subnet_ip}"
+    destination_address_prefix = "*"
+  }
+
+  security_rule {
+    name                       = "Allow-Rdp"
+    priority                   = 300
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "*"
+    source_port_range          = "*"
+    destination_port_range     = "3389"
+    source_address_prefix      = "*"
+    destination_address_prefix = "*"
   }
 }
 
-resource "azurerm_key_vault_access_policy" "main" {
-  vault_name          = "${azurerm_key_vault.terraform.name}"
-  resource_group_name = "${azurerm_key_vault.terraform.resource_group_name}"
-
-  tenant_id = "${data.azurerm_client_config.current.tenant_id}"
-  #object_id = "${data.azurerm_client_config.current.service_principal_object_id}"
-  object_id = "5afbc374-b391-4c63-bd64-7deb080e0487"
-
-  secret_permissions = [
-    "get",
-    "list",
-    "set",
-  ]
-}
-
-resource "azurerm_key_vault_access_policy" "child" {
-  vault_name          = "${azurerm_key_vault.terraform.name}"
-  resource_group_name = "${azurerm_key_vault.terraform.resource_group_name}"
-
-  tenant_id = "${data.azurerm_client_config.current.tenant_id}"
-  object_id = "${var.service_principal_object_id}"
-
-  secret_permissions = [
-    "get",
-  ]
-}
-
-resource "random_id" "server" {
-  keepers = {
-    ami_id = 2
-  }
-  byte_length = 8
-}
-
-resource "azurerm_key_vault_secret" "terraform" {
-  name      = "terraform-vm-${terraform.workspace}"
-  value     = "${random_id.server.hex}aA1!"
-  vault_uri = "${azurerm_key_vault.terraform.vault_uri}"
+resource "azurerm_subnet_network_security_group_association" "terraform" {
+  subnet_id                 = "${azurerm_subnet.backend.id}"
+  network_security_group_id = "${azurerm_network_security_group.backend.id}"
 }
 
 resource "azurerm_virtual_machine" "terraform" {
@@ -95,11 +84,15 @@ resource "azurerm_virtual_machine" "terraform" {
 
   os_profile {
     computer_name  = "terraform-${terraform.workspace}"
-    admin_username = "testadmin"
-    admin_password = "${random_id.server.hex}aA1!"
+    admin_username = "vmadmin"
+    admin_password = "${var.password}"
   }
 
   os_profile_windows_config  {
     # disable_password_authentication = false
   }
+}
+
+output "backend_ip" {
+  value = "${var.subnet_ip}"
 }

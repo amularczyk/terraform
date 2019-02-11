@@ -4,7 +4,7 @@ variable "location" {}
 
 variable "virtual_network_name" {}
 
-variable "service_principal_object_id" {}
+variable "password" {}
 
 variable "subnet_ip" {
   type = "string"
