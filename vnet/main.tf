@@ -1,7 +1,7 @@
 resource "azurerm_network_security_group" "webapp" {
   name                = "WebAppSubnetSecurityGroup-${terraform.workspace}"
-  location            = "${azurerm_resource_group.terraform.location}"
-  resource_group_name = "${azurerm_resource_group.terraform.name}"
+  resource_group_name = "${var.resource_group_name}"
+  location            = "${var.location}"
 
   security_rule {
     name                       = "Allow-Tcp-All"
@@ -18,8 +18,8 @@ resource "azurerm_network_security_group" "webapp" {
 
 resource "azurerm_network_security_group" "backend" {
   name                = "BackendSubnetSecurityGroup-${terraform.workspace}"
-  location            = "${azurerm_resource_group.terraform.location}"
-  resource_group_name = "${azurerm_resource_group.terraform.name}"
+  resource_group_name = "${var.resource_group_name}"
+  location            = "${var.location}"
 
   security_rule {
     name                       = "Allow-Subnet-WebApp"
@@ -36,8 +36,8 @@ resource "azurerm_network_security_group" "backend" {
 
 resource "azurerm_network_security_group" "database" {
   name                = "DatabaseSubnetSecurityGroup-${terraform.workspace}"
-  location            = "${azurerm_resource_group.terraform.location}"
-  resource_group_name = "${azurerm_resource_group.terraform.name}"
+  resource_group_name = "${var.resource_group_name}"
+  location            = "${var.location}"
 
   security_rule {
     name                       = "Allow-Subnet-Backend"
@@ -66,9 +66,9 @@ resource "azurerm_network_security_group" "database" {
 
 resource "azurerm_virtual_network" "terraform" {
   name                = "VNET-${terraform.workspace}"
-  resource_group_name = "${azurerm_resource_group.terraform.name}"
+  resource_group_name = "${var.resource_group_name}"
+  location            = "${var.location}"
   address_space       = ["${var.vnet_ip}"]
-  location            = "${azurerm_resource_group.terraform.location}"
   dns_servers         = ["10.0.0.4", "10.0.0.5"]
 
   subnet {
@@ -76,16 +76,8 @@ resource "azurerm_virtual_network" "terraform" {
     address_prefix  = "${var.webapp_ip}"
     security_group  = "${azurerm_network_security_group.webapp.id}"
   }
+}
 
-  subnet {
-    name            = "Backend"
-    address_prefix  = "${var.backend_ip}"
-    security_group  = "${azurerm_network_security_group.backend.id}"    
-  }
-
-  subnet {
-    name            = "Database"
-    address_prefix  = "${var.database_ip}"
-    security_group  = "${azurerm_network_security_group.database.id}"    
-  }
+output "virtual_network_name" {
+  value = "${azurerm_virtual_network.terraform.name}"
 }

@@ -1,7 +1,3 @@
-output NAME {
-  value = "HELLO WOLRD"
-}
-
 resource "azurerm_sql_server" "terraform" {
   name                = "terraform-mssql-${terraform.workspace}" 
   resource_group_name = "${var.resource_group_name}"
@@ -34,6 +30,6 @@ resource "azurerm_subnet" "terraform" {
   name                 = "SQL"
   resource_group_name  = "${var.resource_group_name}"
   virtual_network_name = "${var.virtual_network_name}"
-  address_prefix       = "${var.sql_ip}"
+  address_prefix       = "${var.subnet_ip}"
   service_endpoints    = ["Microsoft.Sql"]
 }
