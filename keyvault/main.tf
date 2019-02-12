@@ -17,8 +17,7 @@ resource "azurerm_key_vault_access_policy" "main" {
   resource_group_name = "${azurerm_key_vault.terraform.resource_group_name}"
 
   tenant_id = "${data.azurerm_client_config.current.tenant_id}"
-  #object_id = "${data.azurerm_client_config.current.service_principal_object_id}"
-  object_id = "5afbc374-b391-4c63-bd64-7deb080e0487"
+  object_id = "${data.azurerm_client_config.current.service_principal_object_id}"
 
   secret_permissions = [
     "get",
