@@ -11,11 +11,11 @@ provider "azurerm" {
   client_secret = "${var.client_secret}"
 }
 
-terraform {
-  backend "azurerm" {
-    storage_account_name = "terraform8"
-    container_name = "terraform3"
-    resource_group_name = "terraform-state"
-    key = "terraform.tfstate"
-  }
-}
+# terraform {
+#   backend "azurerm" {
+#     storage_account_name = "terraform8"
+#     container_name = "terraform3"
+#     resource_group_name = "terraform-state"
+#     key = "terraform.tfstate"
+#   }
+# }
