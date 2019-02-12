@@ -28,17 +28,17 @@ resource "azurerm_key_vault_access_policy" "main" {
   ]
 }
 
-resource "azurerm_key_vault_access_policy" "child" {
-  vault_name          = "${azurerm_key_vault.terraform.name}"
-  resource_group_name = "${azurerm_key_vault.terraform.resource_group_name}"
+# resource "azurerm_key_vault_access_policy" "child" {
+#   vault_name          = "${azurerm_key_vault.terraform.name}"
+#   resource_group_name = "${azurerm_key_vault.terraform.resource_group_name}"
 
-  tenant_id = "${data.azurerm_client_config.current.tenant_id}"
-  object_id = "${var.service_principal_object_id}"
+#   tenant_id = "${data.azurerm_client_config.current.tenant_id}"
+#   object_id = "${var.service_principal_object_id}"
 
-  secret_permissions = [
-    "get",
-  ]
-}
+#   secret_permissions = [
+#     "get",
+#   ]
+# }
 
 resource "random_id" "server" {
   keepers = {
