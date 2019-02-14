@@ -1,5 +1,5 @@
-resource "azurerm_subnet" "backend" {
-  name                 = "Backend"
+resource "azurerm_subnet" "webapp" {
+  name                 = "Webapp"
   resource_group_name  = "${var.resource_group_name}"
   virtual_network_name = "${var.virtual_network_name}"
   address_prefix       = "${var.subnet_ip}"
@@ -20,26 +20,26 @@ resource "azurerm_network_interface" "terraform" {
 
   ip_configuration {
     name                          = "testconfiguration1"
-    subnet_id                     = "${azurerm_subnet.backend.id}"
+    subnet_id                     = "${azurerm_subnet.webapp.id}"
     private_ip_address_allocation = "Dynamic"
     public_ip_address_id          = "${azurerm_public_ip.vm.id}"
   }
 }
 
-resource "azurerm_network_security_group" "backend" {
-  name                = "BackendSubnetSecurityGroup-${terraform.workspace}"
+resource "azurerm_network_security_group" "webapp" {
+  name                = "WebAppSubnetSecurityGroup-${terraform.workspace}"
   resource_group_name = "${var.resource_group_name}"
   location            = "${var.location}"
 
   security_rule {
-    name                       = "Allow-Subnet-Backend"
+    name                       = "Allow-Tcp-All"
     priority                   = 100
     direction                  = "Inbound"
     access                     = "Allow"
-    protocol                   = "*"
+    protocol                   = "Tcp"
     source_port_range          = "*"
-    destination_port_range     = "*"
-    source_address_prefix      = "${var.subnet_ip}"
+    destination_port_ranges    = ["80","443"]
+    source_address_prefix      = "*"
     destination_address_prefix = "*"
   }
 
@@ -57,11 +57,11 @@ resource "azurerm_network_security_group" "backend" {
 }
 
 resource "azurerm_subnet_network_security_group_association" "terraform" {
-  subnet_id                 = "${azurerm_subnet.backend.id}"
-  network_security_group_id = "${azurerm_network_security_group.backend.id}"
+  subnet_id                 = "${azurerm_subnet.webapp.id}"
+  network_security_group_id = "${azurerm_network_security_group.webapp.id}"
 }
 
-resource "azurerm_virtual_machine" "terraform" {
+resource "azurerm_virtual_machine" "vm" {
   name                  = "terraform-vm-${terraform.workspace}"
   resource_group_name   = "${var.resource_group_name}"
   location              = "${var.location}"
@@ -71,7 +71,7 @@ resource "azurerm_virtual_machine" "terraform" {
   storage_image_reference {
     publisher = "MicrosoftWindowsServer"
     offer     = "WindowsServer"
-    sku       = "2016-Datacenter-Server-Core-smalldisk"
+    sku       = "2016-Datacenter"
     version   = "latest"
   }
 
@@ -83,16 +83,55 @@ resource "azurerm_virtual_machine" "terraform" {
   }
 
   os_profile {
-    computer_name  = "terraform-${terraform.workspace}"
+    computer_name  = "terraform"
     admin_username = "vmadmin"
     admin_password = "${var.password}"
   }
 
   os_profile_windows_config  {
-    # disable_password_authentication = false
+    enable_automatic_upgrades = false
+    provision_vm_agent = true
   }
 }
 
-output "backend_ip" {
+# resource "azurerm_virtual_machine_extension" "dsc" {
+#   count                = 2
+#   name                 = "${element(azurerm_virtual_machine.vm.*.name, count.index+1)}dsc"
+#   location             = "${var.location}"
+#   resource_group_name  = "${var.resource_group_name}"
+#   virtual_machine_name = "${element(azurerm_virtual_machine.vm.*.name, count.index+1)}"
+#   publisher            = "Microsoft.Powershell"
+#   type                 = "DSC"
+#   type_handler_version = "2.73"
+
+#   settings = <<SETTINGS
+#   {
+#     "wmfVersion": "latest",
+#     "configuration": {
+#       "url": "${var.configuration_url}",
+#       "script": "${var.script_name}",
+#       "function": "${var.function_name}"
+#     },
+#     "configurationArguments": {
+#       "RegistrationUrl": "${var.registration_url}",
+#       "ComputerName": "localhost",
+#       "NodeConfigurationName": "${var.conde_configuration_name}",
+#       "RebootNodeIfNeeded": true
+#     }
+#   }
+#   SETTINGS
+
+#   protected_settings = <<SETTINGS
+#   {
+#     "configurationArguments": {
+#       "RegistrationKey": "${var.registration_key}"
+#     }
+#   }
+
+
+# SETTINGS
+# }
+
+output "webapp_ip" {
   value = "${var.subnet_ip}"
 }

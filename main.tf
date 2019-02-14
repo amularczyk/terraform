@@ -29,6 +29,14 @@ module "vm" {
   password                    = "${module.keyvault.password}"
 }
 
+module "backend" {
+  source                      = "./backend"
+  resource_group_name         = "${azurerm_resource_group.terraform.name}"
+  location                    = "${azurerm_resource_group.terraform.location}"
+  virtual_network_name        = "${module.vnet.virtual_network_name}"
+  webapp_ip                   = "${module.vm.webapp_ip}"
+}
+
 module "database" {
   source                = "./database"
   resource_group_name   = "${azurerm_resource_group.terraform.name}"
@@ -37,5 +45,5 @@ module "database" {
   #username              = "${module.serviceprincipal.client_id}"
   username              = "username"
   password              = "${module.keyvault.password}"
-  backend_ip            = "${module.vm.backend_ip}"
+  backend_ip            = "${module.backend.backend_ip}"
 }
