@@ -1,12 +1,11 @@
-﻿Configuration InstallIIS {
-  # Import the module that contains the resources we're using.
+﻿Configuration InstallIIS 
+{
   Import-DscResource -ModuleName PsDesiredStateConfiguration
 
-  # The Node statement specifies which targets this configuration will be applied to.
-  Node 'localhost' {
-
-    # Install IIS
-    WindowsFeature InstallWebServer { 
+  Node 'localhost' 
+  {
+    WindowsFeature InstallWebServer 
+    { 
       Ensure = "Present"
       Name = "Web-Server" 
     }

@@ -1,5 +1,4 @@
-﻿# The DSC configuration that will generate metaconfigurations
-[DscLocalConfigurationManager()]
+﻿[DscLocalConfigurationManager()]
 Configuration DscMetaConfigs
 {
 	param
@@ -75,9 +74,6 @@ Configuration DscMetaConfigs
 	}
 }
 
-# Create the metaconfigurations
-# NOTE: DSC Node Configuration names are case sensitive in the portal.
-# TODO: edit the below as needed for your use case
 $Params = @{
 	RegistrationUrl = '';
 	RegistrationKey = '';
@@ -92,6 +88,4 @@ $Params = @{
 	ReportOnly = $False;  # Set to $True to have machines only report to AA DSC but not pull from it
 }
 
-# Use PowerShell splatting to pass parameters to the DSC configuration being invoked
-# For more info about splatting, run: Get-Help -Name about_Splatting
 DscMetaConfigs @Params

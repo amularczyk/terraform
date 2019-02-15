@@ -67,6 +67,8 @@ resource "azurerm_virtual_machine" "vm" {
   location              = "${var.location}"
   network_interface_ids = ["${azurerm_network_interface.terraform.id}"]
   vm_size               = "Standard_DS1_v2"
+  delete_os_disk_on_termination = true
+  delete_data_disks_on_termination = true
 
   storage_image_reference {
     publisher = "MicrosoftWindowsServer"
@@ -81,6 +83,14 @@ resource "azurerm_virtual_machine" "vm" {
     create_option     = "FromImage"
     managed_disk_type = "Standard_LRS"
   }
+  
+  storage_data_disk {
+    name              = "myosdisk2"
+    managed_disk_type = "Standard_LRS"
+    create_option     = "Empty"
+    lun               = 0
+    disk_size_gb      = "1023"
+  }
 
   os_profile {
     computer_name  = "${var.computer_name}"
@@ -94,44 +104,11 @@ resource "azurerm_virtual_machine" "vm" {
   }
 }
 
-resource "azurerm_virtual_machine_extension" "dsc" {
-  count                = 2
-  name                 = "${azurerm_virtual_machine.vm.name}-dsc"
-  location             = "${var.location}"
-  resource_group_name  = "${var.resource_group_name}"
-  virtual_machine_name = "${azurerm_virtual_machine.vm.name}"
-  publisher            = "Microsoft.Powershell"
-  type                 = "DSC"
-  type_handler_version = "2.76"
 
-  settings = <<SETTINGS
-  {
-    "wmfVersion": "latest",
-    "configuration": {
-      "url": "${var.configuration_url}",
-      "script": "${var.script_name}",
-      "function": "${var.function_name}"
-    },
-    "configurationArguments": {
-      "RegistrationUrl": "${var.registration_url}",
-      "ComputerName": "${var.computer_name}",
-      "NodeConfigurationName": "${var.conde_configuration_name}",
-      "RebootNodeIfNeeded": true
-    }
-  }
-  SETTINGS
-
-  protected_settings = <<SETTINGS
-  {
-    "configurationArguments": {
-      "RegistrationKey": "${var.registration_key}"
-    }
-  }
-
-
-SETTINGS
+output "virtual_machine_name" {
+  value = "${azurerm_virtual_machine.vm.name}"
 }
 
-output "webapp_ip" {
-  value = "${var.subnet_ip}"
+output "computer_name" {
+  value = "${var.computer_name}"
 }

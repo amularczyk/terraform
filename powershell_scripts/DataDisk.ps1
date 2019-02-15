@@ -1,15 +1,18 @@
-﻿Configuration DataDisk
+﻿Configuration DataDisk 
 {
-  Import-DSCResource -ModuleName xStorage 
+  Import-DSCResource -ModuleName xStorage
 
-  Node localhost {
-    xWaitforDisk Disk2 {
-      DiskNumber = 2
+  Node 'localhost' 
+  {
+    xWaitforDisk Disk2 
+    {
+      DiskId = 2
       RetryIntervalSec = 60
-      Count = 60
+      RetryCount = 10
     }
-    xDisk FVolume {
-      DiskNumber = 2
+    xDisk FVolume 
+    {
+      DiskId = 2
       DriveLetter = 'F'
       FSLabel = 'Data'
     }

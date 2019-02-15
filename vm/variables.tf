@@ -14,22 +14,3 @@ variable "subnet_ip" {
 variable "computer_name" {
   default = "terraform"
 }
-
-variable "configuration_url" {
-  default = "https://terraform8.blob.core.windows.net/automation2/DscMetaConfigs.zip"
-}
-variable "script_name" {
-  default = "DscMetaConfigs.ps1"
-}
-variable "function_name" {
-  default = "DscMetaConfigs"
-}
-variable "registration_url" {
-  default = ""
-}
-variable "registration_key" {
-  default = ""
-}
-variable "conde_configuration_name" {
-  default = "InstallIIS.localhost"
-}
