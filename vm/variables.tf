@@ -8,25 +8,28 @@ variable "password" {}
 
 variable "subnet_ip" {
   type = "string"
-  default = "10.0.1.0/24"
+  default = "10.1.1.0/24"
 }
 
+variable "computer_name" {
+  default = "terraform"
+}
 
 variable "configuration_url" {
   default = "https://terraform8.blob.core.windows.net/automation2/DscMetaConfigs.zip"
 }
 variable "script_name" {
-  default = "DscMetaConfig.zip"
+  default = "DscMetaConfigs.ps1"
 }
 variable "function_name" {
-  default = "DscMetaConfig"
+  default = "DscMetaConfigs"
 }
 variable "registration_url" {
-  default = "https://we-agentservice-prod-1.azure-automation.net/accounts/b675921d-17d0-4d0d-94b7-89dbb588c77a"
+  default = ""
 }
 variable "registration_key" {
-  default = "YcsLa7qG/QmNpeNL3KBQL+C6SuVhOtWyl4U5ngl9QnH9W0ztrTl9WJ2YjbFTS5hexk0+6aNZEPZ1aGwS6SCZfg=="
+  default = ""
 }
 variable "conde_configuration_name" {
-  default = "InstallIIS"
+  default = "InstallIIS.localhost"
 }

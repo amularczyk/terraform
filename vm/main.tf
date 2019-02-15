@@ -83,7 +83,7 @@ resource "azurerm_virtual_machine" "vm" {
   }
 
   os_profile {
-    computer_name  = "terraform"
+    computer_name  = "${var.computer_name}"
     admin_username = "vmadmin"
     admin_password = "${var.password}"
   }
@@ -94,43 +94,43 @@ resource "azurerm_virtual_machine" "vm" {
   }
 }
 
-# resource "azurerm_virtual_machine_extension" "dsc" {
-#   count                = 2
-#   name                 = "${element(azurerm_virtual_machine.vm.*.name, count.index+1)}dsc"
-#   location             = "${var.location}"
-#   resource_group_name  = "${var.resource_group_name}"
-#   virtual_machine_name = "${element(azurerm_virtual_machine.vm.*.name, count.index+1)}"
-#   publisher            = "Microsoft.Powershell"
-#   type                 = "DSC"
-#   type_handler_version = "2.73"
+resource "azurerm_virtual_machine_extension" "dsc" {
+  count                = 2
+  name                 = "${azurerm_virtual_machine.vm.name}-dsc"
+  location             = "${var.location}"
+  resource_group_name  = "${var.resource_group_name}"
+  virtual_machine_name = "${azurerm_virtual_machine.vm.name}"
+  publisher            = "Microsoft.Powershell"
+  type                 = "DSC"
+  type_handler_version = "2.76"
 
-#   settings = <<SETTINGS
-#   {
-#     "wmfVersion": "latest",
-#     "configuration": {
-#       "url": "${var.configuration_url}",
-#       "script": "${var.script_name}",
-#       "function": "${var.function_name}"
-#     },
-#     "configurationArguments": {
-#       "RegistrationUrl": "${var.registration_url}",
-#       "ComputerName": "localhost",
-#       "NodeConfigurationName": "${var.conde_configuration_name}",
-#       "RebootNodeIfNeeded": true
-#     }
-#   }
-#   SETTINGS
+  settings = <<SETTINGS
+  {
+    "wmfVersion": "latest",
+    "configuration": {
+      "url": "${var.configuration_url}",
+      "script": "${var.script_name}",
+      "function": "${var.function_name}"
+    },
+    "configurationArguments": {
+      "RegistrationUrl": "${var.registration_url}",
+      "ComputerName": "${var.computer_name}",
+      "NodeConfigurationName": "${var.conde_configuration_name}",
+      "RebootNodeIfNeeded": true
+    }
+  }
+  SETTINGS
 
-#   protected_settings = <<SETTINGS
-#   {
-#     "configurationArguments": {
-#       "RegistrationKey": "${var.registration_key}"
-#     }
-#   }
+  protected_settings = <<SETTINGS
+  {
+    "configurationArguments": {
+      "RegistrationKey": "${var.registration_key}"
+    }
+  }
 
 
-# SETTINGS
-# }
+SETTINGS
+}
 
 output "webapp_ip" {
   value = "${var.subnet_ip}"
