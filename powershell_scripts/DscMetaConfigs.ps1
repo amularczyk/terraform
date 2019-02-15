@@ -79,10 +79,10 @@ Configuration DscMetaConfigs
 # NOTE: DSC Node Configuration names are case sensitive in the portal.
 # TODO: edit the below as needed for your use case
 $Params = @{
-	RegistrationUrl = 'https://we-agentservice-prod-1.azure-automation.net/accounts/b675921d-17d0-4d0d-94b7-89dbb588c77a';
-	RegistrationKey = '9zPvy1aia8a24z02YuSXa8jFYorkNIqZzpeBL69jqbgFlzfU4TfRiNnMSd2C0RzdibQtKCY5/8DXZ9SyC45iOA==';
-	ComputerName = @('terraform');
-	NodeConfigurationName = 'InstallIIS.localhost';
+	RegistrationUrl = '';
+	RegistrationKey = '';
+	ComputerName = @('');
+	NodeConfigurationName = '';
 	RefreshFrequencyMins = 30;
 	ConfigurationModeFrequencyMins = 15;
 	RebootNodeIfNeeded = $False;
