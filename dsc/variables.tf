@@ -23,9 +23,9 @@ variable "function_name" {
 }
 
 variable "registration_url" {
-  default = "https://we-agentservice-prod-1.azure-automation.net/accounts/b675921d-17d0-4d0d-94b7-89dbb588c77a"
+  default = ""
 }
 
 variable "registration_key" {
-  default = "f512f/gHM7YLYKBNhfhcyYEuhIlfvp2cTRvAB2fF9t95aBFnbQ2K6ZjYaXlmpBVEyYG1A9liTOe20bDpE4c2Tg=="
+  default = ""
 }
