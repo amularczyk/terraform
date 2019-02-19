@@ -9,14 +9,15 @@ Configuration DscMetaConfigs
 		[String]$RegistrationKey,
 		[Parameter(Mandatory=$True)]
 		[String[]]$ComputerName,
+		[Parameter(Mandatory=$True)]
+		[String]$NodeConfigurationName,
 		[Int]$RefreshFrequencyMins = 30,
 		[Int]$ConfigurationModeFrequencyMins = 15,
 		[String]$ConfigurationMode = 'ApplyAndMonitor',
-		[String]$NodeConfigurationName,
 		[Boolean]$RebootNodeIfNeeded = $False,
 		[String]$ActionAfterReboot = 'ContinueConfiguration',
 		[Boolean]$AllowModuleOverwrite = $False,
-		[Boolean]$ReportOnly
+		[Boolean]$ReportOnly = $False
 	)
 
 	if(!$NodeConfigurationName -or $NodeConfigurationName -eq '')
@@ -74,18 +75,4 @@ Configuration DscMetaConfigs
 	}
 }
 
-$Params = @{
-	RegistrationUrl = '';
-	RegistrationKey = '';
-	ComputerName = @('');
-	NodeConfigurationName = '';
-	RefreshFrequencyMins = 30;
-	ConfigurationModeFrequencyMins = 15;
-	RebootNodeIfNeeded = $False;
-	AllowModuleOverwrite = $False;
-	ConfigurationMode = 'ApplyAndMonitor';
-	ActionAfterReboot = 'ContinueConfiguration';
-	ReportOnly = $False;  # Set to $True to have machines only report to AA DSC but not pull from it
-}
-
-DscMetaConfigs @Params
+DscMetaConfigs
